@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import { View, TextInput } from 'react-native';
 import { Searchbar, Button } from 'react-native-paper';
+import PropTypes from 'prop-types';
 
 class SearchBar extends Component {
-    state = { term: ''}
+    state = {
+        term: ''
+    }
 
     render() {
         const {
@@ -12,22 +15,26 @@ class SearchBar extends Component {
             buttonStyle
         } = styles;
 
-        return (
-            <View style={containerStyle}>
-            <Searchbar
-              style={searchTextStyle}
-              placeholder="Search"
-              onChangeText={query => { this.setState({ term: query }); }}
-              value={this.state.term}
-            />
-            <Button style={buttonStyle} loading={this.props.loading}
-              mode="contained" dark={true}
-              onPress={() => this.props.onPressSearch(this.state.term)}
-            >
-              {this.props.loading ? 'Loading...' : 'Search'}
-            </Button>
-          </View>
-        )
+        if (this.props.showSearch) {
+            return (
+                <View style={containerStyle}>
+                    <Searchbar
+                      style={searchTextStyle}
+                      placeholder="Search"
+                      onChangeText={query => { this.setState({ term: query }); }}
+                      value={this.state.term}
+                    />
+                    <Button style={buttonStyle} loading={this.props.loading}
+                      mode="contained" dark={true}
+                      onPress={() => this.props.onPressSearch(this.state.term)}
+                    >
+                      {this.props.loading ? 'Loading...' : 'Search'}
+                    </Button>
+                </View>
+            );
+        } else {
+            return null;
+        }
     }
 }
 
@@ -45,6 +52,10 @@ const styles = {
     buttonStyle: {
       marginLeft: 10
     }
-  }
+}
+
+SearchBar.propTypes = {
+  showSearch: PropTypes.bool
+};
 
 export default SearchBar;

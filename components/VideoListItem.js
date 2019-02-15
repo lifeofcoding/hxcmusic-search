@@ -20,7 +20,6 @@ const VideoListItem = ({ video }) => {
     } = video.snippet;
     // console.log('video', video);
     return (
-        <View>
           <Card style={cardStyle}>
             <Card.Title style={titleStyle} title={title} subtitle={channelTitle} left={(props) => <Avatar.Icon {...props} size={42} icon="music-video" />} />
             <Card.Content containerStyle={contentStyle}>
@@ -32,8 +31,6 @@ const VideoListItem = ({ video }) => {
               <DownloadButton model={{videoTitle:title, videoID:video.id.videoId}} />
             </Card.Actions>
           </Card>
-          <Divider />
-        </View>
     );
 }
 

@@ -1,12 +1,32 @@
 import React from 'react';
-import { Header } from 'react-native-elements';
+import { TouchableOpacity } from 'react-native';
+import { Appbar } from 'react-native-paper';
+import { withNavigation } from 'react-navigation';
+import PropTypes from 'prop-types';
 
-const AppHeader = ({ headerText }) => ( // { headerText } === props.headerText
-    <Header
-      leftComponent={{ icon: 'menu', color: '#fff' }}
-      centerComponent={{ text: headerText, style: { color: 'white'} }}
-      outerContainerStyles={{ backgroundColor: '#0c0c0c'}}
-    />
-);
+class AppHeader extends React.Component {
+  constructor(props) {
+    super(props);
+  }
 
-export default AppHeader;
+  render() {
+    return (
+      <TouchableOpacity>
+          <Appbar.Header>
+            <Appbar.Action icon="menu" onPress={() => { this.props.navigation.toggleDrawer() }} />
+            <Appbar.Content
+              title="HXCMusic"
+            />
+            <Appbar.Action icon={this.props.searchBoxOpen ? 'close' : 'search'} onPress={() => { this.props.toggleSearch() }} />
+          </Appbar.Header>
+      </TouchableOpacity>
+    );
+  }
+}
+
+AppHeader.propTypes = {
+  toggleSearch: PropTypes.func,
+  searchBoxOpen: PropTypes.bool
+};
+
+export default withNavigation(AppHeader);
