@@ -4,6 +4,7 @@ import YTSearch from 'youtube-api-search';
 import AppHeader from './AppHeader';
 import SearchBar from './SearchBar';
 import VideoList from './VideoList';
+import Player from './Player';
 import { Avatar, DarkTheme, Provider as PaperProvider } from 'react-native-paper';
 
 import { apiUrl } from '../config.json';
@@ -58,7 +59,6 @@ export default class Home extends Component {
         .then((response) => response.json())
         .then((response) => response.items)
         .then((videos) => {
-          console.log(videos)
           this.setState({
             loading: false,
             videos
@@ -84,6 +84,7 @@ export default class Home extends Component {
                 <AppHeader headerText='HXCMusic Search' searchBoxOpen={this.state.showSearch} toggleSearch={this.searchBox} />
                 <SearchBar loading={loading} onPressSearch={this.onPressSearch} showSearch={this.state.showSearch} />
                 <VideoList videos={videos} searchTerms={this.state.searchTerms} />
+                <Player />
               </View>
           </PaperProvider>
         );

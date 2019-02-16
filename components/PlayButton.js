@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Button } from 'react-native-paper';
 // import { Button } from 'react-native-paper';
-import { Audio } from 'expo';
+import Player from '../actions/Player';
+
 const sanitize = (filename) => require('slugify')(filename.replace('/', ''), { remove: /"<>#%\{\}\|\\\^~\[\]`;\?:@=&\//g });
 
 export default class PlayButton extends Component {
@@ -16,27 +17,26 @@ export default class PlayButton extends Component {
     this.playSound = this.playSound.bind(this);
   }
 
-  async playSound(url) {
+  playSound(url, title) {
     console.log('url:', url);
-    // RNAudioStreamer.setUrl(url)
-    // RNAudioStreamer.play()
-      // await Audio.setIsEnabledAsync(true);
 
-      if (!this.state.isPlaying) {
-        this.sound = this.sound || new Audio.Sound();
+    Player.playSong({
+        title,
+        url
+    })
 
-        if (!this.state.init) {
-          await this.sound.loadAsync({uri: url});
-        }
-
-        await this.sound.playAsync();
-      } else {
-        await this.sound.pauseAsync();
-      }
-
-      this.setState({
+    this.setState({
         init: true,
         isPlaying: !this.state.isPlaying
+    })
+  }
+
+  stopSound() {
+      Player.stop()
+
+      this.setState({
+          init: true,
+          isPlaying: !this.state.isPlaying
       })
   }
 
@@ -46,7 +46,11 @@ export default class PlayButton extends Component {
     return (
       <Button icon={this.state.isPlaying ? 'pause-circle-outline' : 'play-circle-outline'} mode="contained" compact={false} onPress={() => {
           console.log('props', model.videoID, sanitize(model.videoTitle))
-          this.playSound(`http://lifeofcoding.online/yt-serve/${model.videoID}/stream.mp3`);
+          if (!this.state.isPlaying) {
+              this.playSound(`http://lifeofcoding.online/yt-serve/${model.videoID}/stream.mp3`, sanitize(model.videoTitle));
+          } else if (this.state.init) {
+              this.stopSound();
+          }
       }}>
         {this.state.isPlaying ? 'Pause' : 'Play'}
       </Button>
