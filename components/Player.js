@@ -13,6 +13,7 @@ export default class Player extends React.Component {
         currentlyPlaying: {
             currentTime: ''
         },
+        paused: false,
         isPlaying: false,
         visible: false,
         song: {
@@ -39,6 +40,7 @@ export default class Player extends React.Component {
             this.sound.stopAsync();
 
             this.setState({
+                paused: false,
                 isPlaying: false,
                 visible: false,
                 song: {
@@ -49,6 +51,8 @@ export default class Player extends React.Component {
             })
         })
 
+        this.play = this.play.bind(this)
+        this.pause = this.pause.bind(this)
         this.handleViewRef = ref => this.view = ref;
         this.bounce = () => this.view.slideInUp(1500).then(endState => console.log(endState.finished ? 'bounce finished' : 'bounce cancelled'));
     }
@@ -133,21 +137,23 @@ export default class Player extends React.Component {
         console.log('song ended');
     }
 
+    pause() {
+        this.play(this.state.song.url, this.state.song.title);
+        
+        this.setState({
+            paused: !this.state.paused
+        })
+    }
+    
   render() {
     const { visible, song } = this.state;
 
     if (this.state.visible) {
         return (
             <Animatable.View style={styles.bottom} ref={this.handleViewRef}>
-                <Appbar style={{flex:1, flexDirection:'row', justifyContent:'space-evenly'}}>
-                    <Appbar.Action icon={{ source: { uri: 'https://avatars0.githubusercontent.com/u/17571969?v=3&s=400' } }} onPress={() => console.log('Pressed avatar')} />
-                    <Appbar.Action icon="pause" onPress={() => console.log('Pressed pause')} />
-                    <Appbar.Content>
-                        <View>
-                        <Text>Now Playing: {song.title}</Text>
-                        </View>
-                    </Appbar.Content>
-                    <Appbar.Action icon="close" onPress={() => console.log('Pressed close')} />
+                <Appbar style={styles.appbar}>
+                    <Appbar.Action icon={this.state.paused ? 'play-circle-outline' : 'pause'} onPress={this.pause} />
+                    <Appbar.Content title="Now Playing:" subtitle={song.title}/>
                   </Appbar>
             </Animatable.View>
         );
@@ -159,11 +165,17 @@ export default class Player extends React.Component {
 
 
 const styles = StyleSheet.create({
+  appbar: {
+      flex:1,
+      flexDirection:'row',
+      justifyContent:'space-evenly',
+      backgroundColor: 'rgba(0, 0, 0, 0.6)'
+  },
   bottom: {
       padding:10,
     flex:1,
     flexDirection:'row',
-    backgroundColor: '#000',
+    backgroundColor: 'rgba(0, 0, 0, 0.6);',
     position: 'absolute',
     left: 0,
     right: 0,

@@ -26,7 +26,14 @@
     "android": {
       "package": "com.hxcmusic.search",
       "versionCode": 1,
-      "permissions": []
+      "permissions": [
+          'android.permission.INTERNET',
+          'android.permission.NOTIFICATIONS',
+          'android.permission.USER_FACING_NOTIFICATIONS',
+          'android.permission.READ_EXTERNAL_STORAGE',
+          'android.permission.WRITE_EXTERNAL_STORAGE',
+          'android.permission.ACCESS_NETWORK_STATE'
+      ]
     }
   }
 }

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button } from 'react-native-paper';
-import { WebBrowser, FileSystem } from 'expo';
+import { ToastAndroid } from 'react-native';
+import { FileSystem, Notifications, WebBrowser } from 'expo';
 const sanitize = (filename) => require('slugify')(encodeURIComponent(filename.replace('/', '')), { remove: /"<>#%\{\}\|\\\^~\[\]`;\?:@=&\//g });
 
 class DownloadButton extends Component {
@@ -15,6 +16,7 @@ class DownloadButton extends Component {
     }
 
     this.onPress = this.onPress.bind(this);
+    this.listenForNotifications = this.listenForNotifications.bind(this);
   }
 
   checkProgress(downloadProgress) {
@@ -26,17 +28,67 @@ class DownloadButton extends Component {
   }
 
   async downloadFile(url, filename, callback) {
-    const fileUri = FileSystem.documentDirectory + filename;
-
-    let downloadObject = FileSystem.createDownloadResumable(
+    let fileUri = FileSystem.documentDirectory + filename;
+    FileSystem.downloadAsync(
       url,
       fileUri,
       {},
       this.checkProgress
-    );
-    let response = await downloadObject.downloadAsync();
+    ).then(({ uri }) => {
+      console.log('Finished downloading to ', uri);
 
-    callback(response)
+      const localnotification = {
+        title: 'Download has finished',
+        body: filename + " has been downloaded. Tap to open file.",
+        android: {
+          sound: true,
+        },
+        data: {
+          filename: filename
+        },
+      };
+      localnotification.data.title = localnotification.title;
+      localnotification.data.body = localnotification.body;
+      let sendAfterFiveSeconds = Date.now();
+      sendAfterFiveSeconds += 3000;
+
+      const schedulingOptions = { time: sendAfterFiveSeconds };
+      Notifications.scheduleLocalNotificationAsync(
+        localnotification,
+        schedulingOptions
+      );
+      
+      callback(uri);
+    })
+    .catch(error => {
+        console.error(error);
+        Alert.alert(error);
+    });
+  };
+
+  listenForNotifications() {
+    Notifications.addListener(notification => {
+      if (notification.origin === 'received') {
+        // We could also make our own design for the toast
+        // _this.refs.toast.show(<View><Text>hello world!</Text></View>);
+
+        ToastAndroid.showWithGravity(
+          notification.data.filename + ' Finished Downloading!',
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+      } else if (notification.origin === 'selected') {
+        //this.openFile(notification.data.fileUri);
+      }
+        // Expo.Notifications.setBadgeNumberAsync(number);
+        // Notifications.setBadgeNumberAsync(10);
+        // Notifications.presentLocalNotificationAsync(notification);
+        // Alert.alert(notification.title, notification.body);
+    });
+  }
+
+  componentWillMount() {
+    this.listenForNotifications();
   }
 
   onPress() {

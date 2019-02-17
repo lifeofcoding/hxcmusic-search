@@ -1,5 +1,6 @@
 import React from 'react';
 import { ScrollView, View, Animated, Text } from 'react-native';
+import { ActivityIndicator, Colors } from 'react-native-paper';
 import VideoListItem from './VideoListItem';
 import StaggerChildren from './Stagger';
 
@@ -26,7 +27,7 @@ const VideoList = ({ videos, searchTerms }) => {
             )
         } else {
             return (
-                <Text>Loading...</Text>
+                <ActivityIndicator animating={true} color={Colors.cyan800} />
             )
         }
     })()

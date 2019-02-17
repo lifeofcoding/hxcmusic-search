@@ -1,23 +1,53 @@
 import React, { Component } from 'react';
 import Home from './components/Home';
+import About from './components/About';
 import { createDrawerNavigator, createAppContainer } from "react-navigation";
-import { ActivityIndicator, Colors } from 'react-native-paper';
-
+import { ActivityIndicator, Colors, DarkTheme, Provider as PaperProvider } from 'react-native-paper';
 import { apiKeys } from './config.json';
 import { Permissions, Notifications, Font } from 'expo';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 const PUSH_REGISTRATION_ENDPOINT = 'http://lifeofcoding.online:3535/token';
 const MESSAGE_ENPOINT = 'http://lifeofcoding.online:3535/message';
 
 const API_KEY = apiKeys[Math.floor(Math.random() * apiKeys.length)];
 
+const theme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: 'black',
+    accent: 'cyan',
+  },
+};
+
+const styles = StyleSheet.create({
+  loading: {
+    justifyContent: 'center',
+    alignSelf: 'center',
+    margin: 10,
+  },
+});
+
 const MyDrawerNavigator = createDrawerNavigator({
     Home: {
         screen: Home,
-      }
+      },
+     About: {
+         screen: About
+     }
     }, {
     drawerBackgroundColor:'#000',
     drawerType:'slide',
+    contentOptions: {
+      activeTintColor: Colors.cyan800,
+      inactiveTintColor:'#CCC',
+      itemsContainerStyle: {
+        marginVertical: 0,
+      },
+      iconContainerStyle: {
+        opacity: 1
+      }
+    }
 });
 
 const AppContainer = createAppContainer(MyDrawerNavigator);
@@ -26,6 +56,7 @@ export default class App extends React.Component {
   constructor() {
     super()
     this.state = {
+      networkAlert: false,
       notification:'',
       fontsAreLoaded: false,
       notification: null,
@@ -42,18 +73,14 @@ export default class App extends React.Component {
       Ionicons: require("@expo/vector-icons/fonts/Ionicons.ttf"),
     });
 
-    this.setState({ fontsAreLoaded: true, messageText:'test', messageTitle:'HXCMusic Alert'})
-    this.sendMessage()
+    this.setState({ fontsAreLoaded: true })
+    //this.sendMessage()
   }
 
 
   handleNotification(notification) {
   	console.log('received notification:', notification);
     this.setState({ notification });
-  }
-
-  handleChangeText(text) {
-    this.setState({ messageText: text });
   }
 
   async sendMessage() {
@@ -72,7 +99,7 @@ export default class App extends React.Component {
   }
 
   async registerForPushNotificationsAsync() {
-    const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+    const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS, Permissions.USER_FACING_NOTIFICATIONS);
     if (status !== 'granted') {
       return;
     }
@@ -86,10 +113,6 @@ export default class App extends React.Component {
       body: JSON.stringify({
         token: {
           value: token,
-        },
-        user: {
-          username: 'warly',
-          name: 'Dan Ward'
         },
       }),
     });
@@ -105,46 +128,19 @@ export default class App extends React.Component {
     const { fontsAreLoaded } = this.state;
 
     if (!fontsAreLoaded) {
-    	return  <ActivityIndicator animating={true} color={Colors.red800} />;
+    	return  (
+            <PaperProvider theme={theme}>
+                 <View style={styles.loading}>
+                  <ActivityIndicator animating={!this.state.fontsAreLoaded} size="large" color={Colors.cyan800} />
+                </View>
+            </PaperProvider>
+        );
     } else {
     	return (
-    		<AppContainer>
-    			<Notify visible={this.state.notification} />
-    		</AppContainer>
+            <PaperProvider theme={theme}>
+    		  <AppContainer></AppContainer>
+            </PaperProvider>
     	)
 	}
-  }
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'space-between',
-  },
-});
-
-class Notify extends React.Component {
-  state = {
-    visible: false,
-  };
-
-  render() {
-    const { visible } = this.state;
-    return (
-      <View style={styles.container}>
-        <Snackbar
-          visible={this.state.visible}
-          onDismiss={() => this.setState({ visible: false })}
-          action={{
-            label: 'Undo',
-            onPress: () => {
-              // Do something
-            },
-          }}
-        >
-          Hey there! I'm a Snackbar.
-        </Snackbar>
-      </View>
-    );
   }
 }

@@ -5,18 +5,9 @@ import AppHeader from './AppHeader';
 import SearchBar from './SearchBar';
 import VideoList from './VideoList';
 import Player from './Player';
-import { Avatar, DarkTheme, Provider as PaperProvider } from 'react-native-paper';
+import { Avatar } from 'react-native-paper';
 
 import { apiUrl } from '../config.json';
-
-const theme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    primary: 'black',
-    accent: 'cyan',
-  },
-};
 
 const styles = StyleSheet.create({
   icon: {
@@ -79,14 +70,12 @@ export default class Home extends Component {
     render() {
         const { loading, videos } = this.state
         return (
-          <PaperProvider theme={theme}>
-              <View style={{flex: 1, backgroundColor: '#333'}}>
-                <AppHeader headerText='HXCMusic Search' searchBoxOpen={this.state.showSearch} toggleSearch={this.searchBox} />
-                <SearchBar loading={loading} onPressSearch={this.onPressSearch} showSearch={this.state.showSearch} />
-                <VideoList videos={videos} searchTerms={this.state.searchTerms} />
-                <Player />
-              </View>
-          </PaperProvider>
+          <View style={{flex: 1, backgroundColor: '#333'}}>
+            <AppHeader headerText='HXCMusic Search' searchBoxOpen={this.state.showSearch} toggleSearch={this.searchBox} />
+            <SearchBar loading={loading} onPressSearch={this.onPressSearch} showSearch={this.state.showSearch} />
+            <VideoList videos={videos} searchTerms={this.state.searchTerms} />
+            <Player />
+          </View>
         );
     }
 }
