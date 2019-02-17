@@ -22,7 +22,11 @@ const theme = {
 
 const styles = StyleSheet.create({
   loading: {
-    justifyContent: 'center',
+    width:'100%',
+    backgroundColor:'#000',
+    flex:1,
+    flexDirection:'column',
+    justifyContent: 'space-evenly',
     alignSelf: 'center',
     margin: 10,
   },

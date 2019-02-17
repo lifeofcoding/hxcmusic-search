@@ -27,7 +27,9 @@ const VideoList = ({ videos, searchTerms }) => {
             )
         } else {
             return (
-                <ActivityIndicator animating={true} color={Colors.cyan800} />
+                <View style={{flex:1, flexDirection:'column', justifyContent:'space-evenly', alignContent:'center'}}>
+                    <ActivityIndicator animating={true} color={Colors.cyan800} />
+                </View>
             )
         }
     })()

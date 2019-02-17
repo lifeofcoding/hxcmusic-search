@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Button } from 'react-native-paper';
 import { ToastAndroid } from 'react-native';
 import { FileSystem, Notifications, WebBrowser } from 'expo';
+import Player from '../actions/Player';
 const sanitize = (filename) => require('slugify')(encodeURIComponent(filename.replace('/', '')), { remove: /"<>#%\{\}\|\\\^~\[\]`;\?:@=&\//g });
 
 class DownloadButton extends Component {
@@ -39,12 +40,13 @@ class DownloadButton extends Component {
 
       const localnotification = {
         title: 'Download has finished',
-        body: filename + " has been downloaded. Tap to open file.",
+        body: filename + ' has been downloaded!',
         android: {
           sound: true,
         },
         data: {
-          filename: filename
+          filename: filename,
+          fileUri: uri
         },
       };
       localnotification.data.title = localnotification.title;
@@ -72,13 +74,21 @@ class DownloadButton extends Component {
         // We could also make our own design for the toast
         // _this.refs.toast.show(<View><Text>hello world!</Text></View>);
 
-        ToastAndroid.showWithGravity(
+        ToastAndroid.showWithGravityAndOffset(
           notification.data.filename + ' Finished Downloading!',
           ToastAndroid.SHORT,
-          ToastAndroid.CENTER,
+          ToastAndroid.BOTTOM,
+          0,
+          50
         );
       } else if (notification.origin === 'selected') {
         //this.openFile(notification.data.fileUri);
+          /*
+        Player.playSong({
+            title: notification.data.filename.replace('.mp3',''),
+            url: notification.data.fileUri
+        })
+        */
       }
         // Expo.Notifications.setBadgeNumberAsync(number);
         // Notifications.setBadgeNumberAsync(10);
@@ -97,9 +107,9 @@ class DownloadButton extends Component {
       disabled: true
     });
 
-    let url = `http://lifeofcoding.online/yt-serve/${this.props.model.videoID}/${sanitize(this.props.model.videoTitle)}.mp3`;
+    let url = `http://lifeofcoding.online/yt-serve/${this.props.model.videoID}/${encodeURIComponent(this.props.model.videoTitle)}.mp3`;
     // WebBrowser.openBrowserAsync(url);
-    this.downloadFile(url, `${sanitize(this.props.model.videoTitle)}.mp3`, (res) => {
+    this.downloadFile(url, `${this.props.model.videoTitle}.mp3`, (res) => {
       console.log('Done!', res);
       this.setState({
         loading: false,
