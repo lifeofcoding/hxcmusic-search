@@ -27,8 +27,13 @@ class DownloadButton extends Component {
 
       console.log('Progress:', progress);
   }
-
+    
   async downloadFile(url, filename, callback) {
+      let result = await WebBrowser.openBrowserAsync(url);
+      callback(result)
+  }
+
+  async downloadFile2(url, filename, callback) {
     let fileUri = FileSystem.documentDirectory + filename;
     FileSystem.downloadAsync(
       url,

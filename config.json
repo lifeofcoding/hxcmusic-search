@@ -4,5 +4,6 @@
     /* "AIzaSyCXd3M-Cb0KvyBMKTNS23nfaoiez6l51Go",
     "AIzaSyAYnNH4aaQ0Kqdzh0VL4sMGvGWfYzs_sDU" */
   ],
-  "apiUrl": "http://lifeofcoding.online/"
+  "apiUrl": "http://lifeofcoding.online/",
+  "version":"0.0.1"
 }

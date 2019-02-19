@@ -25,9 +25,7 @@ class AboutHeader extends React.Component {
   render() {
         return (
           <Appbar.Header>
-            <Appbar.BackAction
-              onPress={() => this.props.navigation.goBack()}
-            />
+            <Appbar.Action icon="menu" onPress={() => { this.props.navigation.toggleDrawer() }} />
             <Appbar.Content
               title="About"
               subtitle="HXCMusic Search App"

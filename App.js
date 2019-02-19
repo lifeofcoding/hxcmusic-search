@@ -3,13 +3,10 @@ import Home from './components/Home';
 import About from './components/About';
 import { createDrawerNavigator, createAppContainer } from "react-navigation";
 import { ActivityIndicator, Colors, DarkTheme, Provider as PaperProvider } from 'react-native-paper';
-import { apiKeys } from './config.json';
+import { apiUrl, version } from './config.json';
 import { Permissions, Notifications, Font } from 'expo';
 import { StyleSheet, View } from 'react-native';
-const PUSH_REGISTRATION_ENDPOINT = 'http://lifeofcoding.online:3535/token';
-const MESSAGE_ENPOINT = 'http://lifeofcoding.online:3535/message';
-
-const API_KEY = apiKeys[Math.floor(Math.random() * apiKeys.length)];
+import UpdateAlert from './components/UpdateAlert';
 
 const theme = {
   ...DarkTheme,
@@ -65,7 +62,9 @@ export default class App extends React.Component {
       fontsAreLoaded: false,
       notification: null,
       messageTitle:'',
-      messageText: ''
+      messageText: '',
+      hasUpdate: false,
+      downloadUrl:'none'
     }
   }
 
@@ -88,7 +87,7 @@ export default class App extends React.Component {
   }
 
   async sendMessage() {
-    fetch(MESSAGE_ENPOINT, {
+    fetch(apiUrl + '/message', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -108,7 +107,7 @@ export default class App extends React.Component {
       return;
     }
     let token = await Notifications.getExpoPushTokenAsync();
-    return fetch(PUSH_REGISTRATION_ENDPOINT, {
+    return fetch(apiUrl + 'token', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -124,24 +123,35 @@ export default class App extends React.Component {
     this.notificationSubscription = Notifications.addListener(this.handleNotification);
   }
 
+  getVersion(v) {
+      return v.split('.').join('');
+  }
+
   componentDidMount() {
-    this.registerForPushNotificationsAsync();
+    this.registerForPushNotificationsAsync()
+    .then((response)=> response.json())
+    .then((versionData)=> {
+        if (this.getVersion(versionData.version) > this.getVersion(version)) {
+            this.setState({ hasUpdate: true, downloadUrl: versionData.download })
+        }
+    });
   }
 
   render() {
-    const { fontsAreLoaded } = this.state;
+    const { fontsAreLoaded, hasUpdate, downloadUrl } = this.state;
 
     if (!fontsAreLoaded) {
     	return  (
             <PaperProvider theme={theme}>
                  <View style={styles.loading}>
-                  <ActivityIndicator animating={!this.state.fontsAreLoaded} size="large" color={Colors.cyan800} />
+                  <ActivityIndicator animating={!fontsAreLoaded} size="large" color={Colors.cyan800} />
                 </View>
             </PaperProvider>
         );
     } else {
     	return (
             <PaperProvider theme={theme}>
+              <UpdateAlert  animation="zoomInUp" visible={hasUpdate} downloadUrl={downloadUrl}/>
     		  <AppContainer></AppContainer>
             </PaperProvider>
     	)
