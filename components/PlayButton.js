@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button } from 'react-native-paper';
 // import { Button } from 'react-native-paper';
+import PlayerStore from '../stores/Player';
 import Player from '../actions/Player';
 
 const sanitize = (filename) => require('slugify')(filename.replace('/', ''), { remove: /"<>#%\{\}\|\\\^~\[\]`;\?:@=&\//g });
@@ -11,10 +12,28 @@ export default class PlayButton extends Component {
 
     this.state = {
       init: false,
-      isPlaying: false
+      isPlaying: false,
+      song: {}
     }
 
     this.playSound = this.playSound.bind(this);
+
+    PlayerStore.on('STOP_PLAYING', (song) => {
+        if (this.state.song.hasOwnProperty('url') && song.url === this.state.song.url) {
+            PlayerStore.getSound().stopAsync();
+
+            this.setState({
+                paused: false,
+                isPlaying: false,
+                visible: false,
+                song: {
+                  url:'',
+                  title:'',
+                  duration: ''
+                }
+            })
+        }
+    })
   }
 
   playSound(url, title) {
@@ -27,12 +46,16 @@ export default class PlayButton extends Component {
 
     this.setState({
         init: true,
-        isPlaying: !this.state.isPlaying
+        isPlaying: !this.state.isPlaying,
+        song: {
+            url,
+            title
+        }
     })
   }
 
   stopSound() {
-      Player.stop()
+      Player.stop(this.state.song)
 
       this.setState({
           init: true,

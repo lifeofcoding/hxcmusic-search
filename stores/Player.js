@@ -25,6 +25,16 @@ let PlayerStore = _.assign({}, EventEmitter.prototype, {
     return _getPlaying();
   },
 
+  getSound: function() {
+      return this._sound;
+  },
+
+  setSound: function(s) {
+      this._sound = s;
+
+      return this._sound;
+  },
+
   emitChange: function() {
     this.emit(CHANGE_EVENT);
   },
@@ -54,7 +64,7 @@ AppDispatcher.register(function(action) {
         _setPlaying({})
         _setVisible(false);
     break;
-    
+
     default:
       // no op
   }

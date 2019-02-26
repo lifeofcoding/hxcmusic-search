@@ -28,7 +28,8 @@ export default class Home extends Component {
         searchTerms: '',
         showSearch: false,
         loading: false,
-        videos: []
+        videos: [],
+        page: 1
     }
 
     componentWillMount() {
@@ -36,17 +37,19 @@ export default class Home extends Component {
         this.searchBox = this.searchBox.bind(this);
     }
 
-    onPressSearch = term => {
+    onPressSearch = (term, page) => {
         this.searchYT(term);
     }
 
-    searchYT = term => {
+    searchYT = (term, page) => {
+        page = page || this.state.page;
+
         this.setState({
             searchTerms: term,
             loading: true
         });
 
-        fetch(`${apiUrl}search/${term}`)
+        fetch(`${apiUrl}search/${term}/${page}`)
         .then((response) => response.json())
         .then((response) => response.items)
         .then((videos) => {
@@ -67,13 +70,21 @@ export default class Home extends Component {
         })
     }
 
+    loadMore() {
+        this.setState({
+            page: this.state.page + 1
+        })
+
+        this.searchYT(this.state.searchTerms, this.state.page);
+    }
+
     render() {
         const { loading, videos } = this.state
         return (
           <View style={{flex: 1, backgroundColor: '#333'}}>
             <AppHeader headerText='HXCMusic Search' searchBoxOpen={this.state.showSearch} toggleSearch={this.searchBox} />
             <SearchBar loading={loading} onPressSearch={this.onPressSearch} showSearch={this.state.showSearch} />
-            <VideoList videos={videos} searchTerms={this.state.searchTerms} />
+            <VideoList videos={videos} loadMore={this.loadMore} searchTerms={this.state.searchTerms} />
             <Player />
           </View>
         );

@@ -37,7 +37,7 @@ export default class Player extends React.Component {
         PlayerStore.on('STOP_PLAYING', () => {
             console.log('store event: PLAY_SONG');
 
-            this.sound.stopAsync();
+            PlayerStore.getSound().stopAsync();
 
             this.setState({
                 paused: false,
@@ -101,17 +101,27 @@ export default class Player extends React.Component {
           notificationIcon: 'music' // Android Only (String), Android Drawable resource name for a custom notification icon
         })
 */
-         if (!this.sound) {
-             this.sound = this.sound || new Audio.Sound();
+        let  sound = PlayerStore.getSound();
+         if (!sound && (url !== this.state.song.url)) {
+             sound = PlayerStore.setSound(new Audio.Sound());
 
              if (!this.state.init) {
-                 await this.sound.loadAsync({uri: url});
+                 await sound.loadAsync({uri: url});
              }
 
-             await this.sound.playAsync();
+             await sound.playAsync();
+         } else if (url === this.state.song.url) {
+             await sound.pauseAsync();
+         } else if (this.state.song.url) {
+             Actions.stop(this.state.song)
          } else {
-             await this.sound.pauseAsync();
+             console.warn('Unknown player state!');
          }
+    }
+
+    async pause(url, track) {
+        if (!PlayerStore.getSound()) return;
+        await sound.pauseAsync();
     }
 
     get song() {
@@ -138,13 +148,13 @@ export default class Player extends React.Component {
     }
 
     pause() {
-        this.play(this.state.song.url, this.state.song.title);
-        
+        this.pause(this.state.song.url, this.state.song.title);
+
         this.setState({
             paused: !this.state.paused
         })
     }
-    
+
   render() {
     const { visible, song } = this.state;
 

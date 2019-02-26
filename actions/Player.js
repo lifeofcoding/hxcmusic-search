@@ -17,9 +17,10 @@ let PlayerActions = {
         });
     },
 
-    stop() {
+    stop(song) {
         AppDispatcher.dispatch({
-            actionType: 'STOP_PLAYING'
+            actionType: 'STOP_PLAYING',
+            song
         });
     }
 
